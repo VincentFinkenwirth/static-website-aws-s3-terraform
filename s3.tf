@@ -19,27 +19,29 @@ resource "aws_s3_bucket_ownership_controls" "website_bucket" {
 resource "aws_s3_bucket_public_access_block" "web" {
   bucket = aws_s3_bucket.web.id
 
-  block_public_acls = false
-  block_public_policy = false
-  ignore_public_acls = false
-  restrict_public_buckets = false
+  block_public_acls = true
+  block_public_policy = true
+  ignore_public_acls = true
+  restrict_public_buckets = true
 }
 
 
 
 # bucket policy (allow public read)
 resource "aws_s3_bucket_policy" "bucket_policy" {
+  depends_on = [aws_s3_bucket.web, aws_cloudfront_origin_access_identity.web]
   bucket = aws_s3_bucket.web.id
 
   policy = jsonencode({
-    Version = "2012-10-17"
-    Id = "AllowGetObjects"
+    Version = "2012-10-17",
     Statement = [
       {
-        Effect = "Allow"
-        Principal = "*"
-        Action = "s3:GetObject"
-        Resource = "arn:aws:s3:::${var.bucket_name}/*"
+        Effect    = "Allow",
+        Principal = {
+          AWS = "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${aws_cloudfront_origin_access_identity.web.id}"
+        },
+        Action   = "s3:GetObject",
+        Resource = "arn:aws:s3:::${aws_s3_bucket.web.bucket}/*"
         }
         ]
     })
@@ -54,7 +56,7 @@ resource "aws_s3_bucket_website_configuration" "web_config" {
   }
 
   error_document {
-    key = "index.html"
+    key = "error.html"
   }
 }
 
@@ -75,4 +77,3 @@ resource "aws_s3_object" "error" {
   etag = "${filemd5("html/error.html")}"
   content_type = "text/html"
 }
-
