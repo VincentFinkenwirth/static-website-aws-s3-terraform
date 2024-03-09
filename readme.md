@@ -27,7 +27,7 @@ aws configure
 - `Default region name`: Enter your preferred AWS region (e.g., `us-east-1`).
 - `Default output format`: Enter `json`.
 
-## Clone repository
+## Clone repository and define variables
 
 Clone the repository and change directory to it.
 
@@ -37,6 +37,13 @@ git clone https://github.com/VincentFinkenwirth/static-website-aws-s3-terraform.
 ```bash
 cd static-website-aws-s3-terraform
 ```
+
+Edit the `terraform.tfvars` file and define the following variables:
+- `bucket_name`: The name of the S3 bucket that will host your website(must be unique across AWS)
+- `cloudfront_price_class`: The price class for the CloudFront distribution (e.g., `PriceClass_100`)
+- `region`: The AWS region where the infrastructure will be deployed (e.g., `us-east-1`)
+
+
 
 
 ## Terraform Usage
