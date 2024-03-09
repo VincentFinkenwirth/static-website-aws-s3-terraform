@@ -15,7 +15,7 @@ resource "aws_s3_bucket_ownership_controls" "website_bucket" {
   }
 }
 
-# Enable public access
+# Directly public access the bucket blocked
 resource "aws_s3_bucket_public_access_block" "web" {
   bucket = aws_s3_bucket.web.id
 
@@ -27,7 +27,7 @@ resource "aws_s3_bucket_public_access_block" "web" {
 
 
 
-# bucket policy (allow public read)
+# bucket policy (allow cloudfront access)
 resource "aws_s3_bucket_policy" "bucket_policy" {
   depends_on = [aws_s3_bucket.web, aws_cloudfront_origin_access_identity.web]
   bucket = aws_s3_bucket.web.id
@@ -47,14 +47,13 @@ resource "aws_s3_bucket_policy" "bucket_policy" {
     })
 }
 
-# Web config
+# Configure bucket for webhosting
 resource "aws_s3_bucket_website_configuration" "web_config" {
   bucket = aws_s3_bucket.web.id
 
   index_document {
     suffix = "index.html"
   }
-
   error_document {
     key = "error.html"
   }
